@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPI Payment – KaushalCorp</title>
+  <style>
+    :root {
+      --primary: #002060;
+      --accent: #2e7d32;
+      --bg: #f6f9ff;
+      --card: #ffffff;
+      --text: #222;
+      --radius: 16px;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .header,
+    .footer {
+      position: fixed;
+      left: 0;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 12px 16px;
+      z-index: 1000;
+      font-weight: 600;
+    }
+    .header {
+      top: 0;
+    }
+    .footer {
+      bottom: 0;
+      font-size: 0.85rem;
+    }
+    .container {
+      padding: 100px 16px 80px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .card {
+      background: var(--card);
+      padding: 32px 24px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+    h2 {
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+    }
+    p.tip {
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      color: #555;
+    }
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    button:hover {
+      filter: brightness(1.1);
+    }
+    .qr-wrapper,
+    .acct-box {
+      display: none;
+      text-align: center;
+      margin-top: 24px;
+    }
+    canvas {
+      margin: auto;
+      border: 6px solid #f1f4ff;
+      border-radius: 12px;
+    }
+    .countdown {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 12px;
+      color: var(--primary);
+    }
+    .acct-box {
+      background: #fdfdfe;
+      padding: 20px;
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+    .acct-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+    .acct-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 6px 0;
+    }
+    .acct-row code {
+      font-size: 0.95rem;
+      word-break: break-all;
+    }
+    .copy-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .copy-btn:active {
+      transform: scale(0.97);
+    }
+    @media (max-width: 450px) {
+      .card {
+        padding: 24px 16px;
+      }
+      h2 {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">KaushalCorp – Secure Payment</div>
+
+  <div class="container">
+    <div class="card">
+      <h2>Pay with UPI</h2>
+      <p class="tip">
+        Enter the amount and tap <b>Pay Now</b>. Your UPI app will open
+        automatically. If not, scan the QR code below.
+      </p>
+      <label for="amount">Amount (₹)</label>
+      <input type="number" id="amount" placeholder="e.g. 9898" min="1" step="0.01" />
+      <button onclick="payNow()">Pay Now</button>
+
+      <div id="qrWrap" class="qr-wrapper">
+        <p>
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/UPI_logo.svg/120px-UPI_logo.svg.png"
+            alt="UPI"
+            style="height: 28px; vertical-align: middle; margin-right: 6px"
+          />
+          Scan this QR in any UPI app
+        </p>
+        <canvas id="qr"></canvas>
+        <div class="countdown" id="timer">15:00</div>
+        <p class="tip" style="margin-top: 12px">
+          Follow these steps in your UPI app:<br />
+          1. Open the app > Scan QR.<br />
+          2. Verify payee name <b>JITENDRA MEHTA</b>.<br />
+          3. Pay the exact amount shown.
+        </p>
+      </div>
+
+      <div id="acctBox" class="acct-box">
+        <h3>Bank Transfer Details</h3>
+        <div class="acct-row">
+          <span>UPI ID:</span>
+          <code>6391348203@naviaxis</code>
+          <button class="copy-btn" onclick="copyText('6391348203@naviaxis')">Copy</button>
+        </div>
+        <div class="acct-row">
+          <span>Account No.:</span>
+          <code>925010019950177</code>
+          <button class="copy-btn" onclick="copyText('925010019950177')">Copy</button>
+        </div>
+        <div class="acct-row">
+          <span>IFSC:</span>
+          <code>UTIB0001575</code>
+          <button class="copy-btn" onclick="copyText('UTIB0001575')">Copy</button>
+        </div>
+        <div class="acct-row"><span>Bank:</span> <code>AXIS BANK</code></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Need help? Call +91‑XXXXXXXXXX</div>
+
+  <a id="upiLink" style="display: none"></a>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script>
+    const VPA = "6391348203@naviaxis";
+    const PAYEE = "JITENDRA MEHTA";
+
+    function payNow() {
+      const amountInput = document.getElementById("amount");
+      const amount = parseFloat(amountInput.value);
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
+        amountInput.focus();
+        return;
+      }
+      const note = "Payment";
+      const upiLink = `upi://pay?pa=${encodeURIComponent(
+        VPA
+      )}&pn=${encodeURIComponent(PAYEE)}&tn=${encodeURIComponent(
+        note
+      )}&am=${amount.toFixed(2)}&cu=INR`;
+      const a = document.getElementById("upiLink");
+      a.href = upiLink;
+      a.click();
+      generateAndShowQR(upiLink);
+    }
+
+    function generateAndShowQR(data) {
+      const wrap = document.getElementById("qrWrap");
+      const qrCanvas = document.getElementById("qr");
+      wrap.style.display = "block";
+      new QRious({ element: qrCanvas, size: 220, value: data });
+      startCountdown(15 * 60);
+    }
+
+    function startCountdown(seconds) {
+      const timerEl = document.getElementById("timer");
+      const acctBox = document.getElementById("acctBox");
+      let remaining = seconds;
+      timerEl.textContent = formatTime(remaining);
+      const interval = setInterval(() => {
+        remaining--;
+        timerEl.textContent = formatTime(remaining);
+        if (remaining <= 0) {
+          clearInterval(interval);
+          acctBox.style.display = "block";
+        }
+      }, 1000);
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60)
+        .toString()
+        .padStart(2, "0");
+      const s = (sec % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Copied!");
+      });
+    }
+  </script>
+</body>
+</html>
